@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/heads")
 @CrossOrigin("*")
 public class HeadController {
 
@@ -25,7 +25,7 @@ public class HeadController {
     @Autowired
     private MenusItemRepository menusItemRepository;
 
-    @PostMapping("/heads")
+    @PostMapping("/")
     public ResponseEntity<CoreResponseBody> addOne (@RequestBody Head head){
 
         Head addedOne = this.headService.addOne(head);
@@ -34,7 +34,7 @@ public class HeadController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/heads/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<CoreResponseBody> update (@PathVariable Long id, @RequestBody Head head){
 
         Head headResult = this.headService.update(id, head);
@@ -43,7 +43,7 @@ public class HeadController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/heads/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<CoreResponseBody> deleteOne (@PathVariable Long id){
 
         CoreResponseBody responseBody;
@@ -57,7 +57,7 @@ public class HeadController {
         }
     }
 
-    @GetMapping("/heads")
+    @GetMapping("/")
     public ResponseEntity<CoreResponseBody> getAll(){
 
         List<Head> results = this.headService.getAll();
@@ -66,7 +66,7 @@ public class HeadController {
         return ResponseEntity.ok(responseBody);
     }
 
-    @GetMapping("/heads")
+    @GetMapping("/{id}")
     public ResponseEntity<CoreResponseBody> getOneById (@PathVariable Long id){
 
         Head result = this.headService.getOneById(id);
