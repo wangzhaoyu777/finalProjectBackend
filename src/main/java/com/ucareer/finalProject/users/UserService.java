@@ -1,0 +1,89 @@
+package com.ucareer.finalProject.users;
+
+import com.ucareer.finalProject.core.JWT;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+
+@Service
+public class UserService {
+
+    private PasswordEncoder encoder;
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    private JWT jwt;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @PostConstruct
+    protected void init() {
+        encoder = new BCryptPasswordEncoder();
+        //newUser.setPassword(encoder.encode(user.getPassword()));
+        // return encoder.matches(user.getPassword(), loginUser.getPassword()) ?
+        //createToken(loginUser) : null;
+    }
+
+    public User userRegister(User userBody) {
+        User foundUser = userRepository.findByUsername(userBody.getUsername());
+        if (foundUser != null) {
+            // username already exist
+            return null;
+        } else {
+            userBody.setPassword(encoder.encode(userBody.getPassword()));
+            userBody.setStatus("Active");
+//            User savingUser = new User();
+//            savingUser.setFirstName(userBody.getFirstName());
+//            savingUser.setLastName(userBody.getLastName());
+//            savingUser.setUsername(userBody.getUsername());
+//            savingUser.setPhone(userBody.getPhone());
+//            savingUser.setAddress(userBody.getAddress());
+//            savingUser.setPassword(encoder.encode(userBody.getPassword()));
+            User savedUser = userRepository.save(userBody);
+            return savedUser;
+        }
+    }
+
+    public String userLogin(LoginRequestBody body){
+        User foundUser = userRepository.findByUsername(body.getUsername());
+        if (foundUser != null) {
+            if (encoder.matches(body.getPassword(), foundUser.getPassword())) {
+                return jwt.creatLoginToken(foundUser.getUsername());
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public User findUser(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public User updateUser(String username, User userRequestBody) {
+        User foundUser = userRepository.findByUsername(username);
+        if(foundUser != null){
+            if(userRequestBody.getFirstName() != null && !userRequestBody.getFirstName().isEmpty()){
+                foundUser.setFirstName(userRequestBody.getFirstName());
+            }
+            if(userRequestBody.getLastName() != null && !userRequestBody.getLastName().isEmpty()){
+                foundUser.setLastName(userRequestBody.getLastName());
+            }
+            if(userRequestBody.getPhone() != null && !userRequestBody.getPhone().isEmpty()){
+                foundUser.setPhone(userRequestBody.getPhone());
+            }
+            if(userRequestBody.getAddress() != null && !userRequestBody.getAddress().isEmpty()){
+                foundUser.setAddress(userRequestBody.getAddress());
+            }
+        }
+        return userRepository.save(foundUser);
+    }
+}
