@@ -1,15 +1,13 @@
 package com.ucareer.finalProject.heads;
 
 import com.ucareer.finalProject.core.CoreResponseBody;
-import com.ucareer.finalProject.menusItems.MenusItem;
+import com.ucareer.finalProject.core.JWT;
 import com.ucareer.finalProject.menusItems.MenusItemRepository;
 import com.ucareer.finalProject.users.User;
-import com.ucareer.finalProject.users.UserRepository;
+import com.ucareer.finalProject.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/heads")
@@ -20,72 +18,47 @@ public class HeadController {
     private HeadService headService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
+
+    @Autowired
+    private HeadRepository headRepository;
+
+    @Autowired
+    private JWT jwt;
 
     @Autowired
     private MenusItemRepository menusItemRepository;
+//todo:
 
-    @PostMapping("/")
-    public ResponseEntity<CoreResponseBody> addOne (@RequestBody Head head){
-
-        Head addedOne = this.headService.addOne(head);
-        CoreResponseBody response = new CoreResponseBody(addedOne,"",null);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<CoreResponseBody> update (@PathVariable Long id, @RequestBody Head head){
-
-        Head headResult = this.headService.update(id, head);
-        CoreResponseBody response = new CoreResponseBody(headResult,"",null);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<CoreResponseBody> deleteOne (@PathVariable Long id){
-
-        CoreResponseBody responseBody;
-        try {
-            this.headService.deleteById(id);
-            responseBody = new CoreResponseBody(true,"deleted successfully",null);
+    @GetMapping("/me")
+    public ResponseEntity<CoreResponseBody> getHead (@RequestHeader("Authorization") String token){
+        String username = jwt.verifyLoginToken(token);
+        if (token == null){
+            CoreResponseBody responseBody = new CoreResponseBody(null,"user is not exist",null);
             return ResponseEntity.ok(responseBody);
-        } catch (Exception e){
-            responseBody = new CoreResponseBody(null, "deleted failed",e);
+        }else {
+            User user = userService.findUser(username);
+            Head foundHead = user.getLanding().getHead();
+            CoreResponseBody responseBody = new CoreResponseBody(foundHead,"head displayed successfully",null);
             return ResponseEntity.ok(responseBody);
         }
     }
 
-    @GetMapping("/")
-    public ResponseEntity<CoreResponseBody> getAll(){
-
-        List<Head> results = this.headService.getAll();
-        CoreResponseBody responseBody = new CoreResponseBody(results,"",null);
-
-        return ResponseEntity.ok(responseBody);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<CoreResponseBody> getOneById (@PathVariable Long id){
-
-        Head result = this.headService.getOneById(id);
-        CoreResponseBody responseBody = new CoreResponseBody(result,"",null);
-
-        return ResponseEntity.ok(responseBody);
-    }
-
-    @GetMapping("/users")
-    public ResponseEntity<CoreResponseBody> getUser(){
-        List<User> foundBody = this.userRepository.findAll();
-        CoreResponseBody response = new CoreResponseBody(foundBody, "display successfully", null);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/menusItems")
-    public ResponseEntity<CoreResponseBody> getMenusItem(){
-        List<MenusItem> foundBody = this.menusItemRepository.findAll();
-        CoreResponseBody response = new CoreResponseBody(foundBody, "display successfully", null);
-        return ResponseEntity.ok(response);
+    @PutMapping("/me")
+    public ResponseEntity<CoreResponseBody> update (@RequestHeader("Authorization") String token, @RequestBody Head head){
+        String username = jwt.verifyLoginToken(token);
+        if (token == null){
+            CoreResponseBody responseBody = new CoreResponseBody(null,"user is not exist",null);
+            return ResponseEntity.ok(responseBody);
+        }else {
+            User user = userService.findUser(username);
+            Head foundHead = user.getLanding().getHead();
+            foundHead.setTitle(head.getTitle());
+            foundHead.setImg_url(head.getImg_url());
+            foundHead.setDescription(head.getDescription());
+            headRepository.save(foundHead);
+            CoreResponseBody responseBody = new CoreResponseBody(foundHead,"updated",null);
+            return ResponseEntity.ok(responseBody);
+        }
     }
 }

@@ -1,9 +1,9 @@
 package com.ucareer.finalProject.menusItems;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ucareer.finalProject.LandingPage.Landing;
+
+import javax.persistence.*;
 
 @Entity
 public class MenusItem {
@@ -15,6 +15,30 @@ public class MenusItem {
     private String name;
     private int price;
     private String img_url;
+
+    private String category;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Landing landing;
+
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Landing getLanding() {
+        return landing;
+    }
+
+    public void setLanding(Landing landing) {
+        this.landing = landing;
+    }
 
     public Long getId() {
         return id;

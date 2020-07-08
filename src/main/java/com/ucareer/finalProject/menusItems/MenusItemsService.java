@@ -44,6 +44,9 @@ public class MenusItemsService {
             if (item.getName() != null && !item.getName().isEmpty()){
                 foundOne.setName(item.getName());
             }
+            if (item.getCategory() != null && !item.getCategory().isEmpty()){
+                foundOne.setCategory(item.getCategory());
+            }
             if (item.getPrice() >= 0 ){
                 foundOne.setPrice(item.getPrice());
             }

@@ -1,12 +1,11 @@
 package com.ucareer.finalProject.heads;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ucareer.finalProject.LandingPage.Landing;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static javax.persistence.TemporalType.TIMESTAMP;
 
@@ -21,9 +20,9 @@ public class Head {
     private String img_url;
     private String title;
 
-
-    @OneToMany(mappedBy = "headId")
-    private List<Landing> landing = new ArrayList<>();
+    @OneToOne(mappedBy = "head")
+    @JsonIgnore
+    private Landing landing;
 
     @Temporal(TIMESTAMP)
     @Column(name = "modified_at", columnDefinition = "TIMESTAMP  default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
@@ -62,14 +61,13 @@ public class Head {
         this.title = title;
     }
 
-    public List<Landing> getLanding() {
+    public Landing getLanding() {
         return landing;
     }
 
-    public void setLanding(List<Landing> landing) {
+    public void setLanding(Landing landing) {
         this.landing = landing;
     }
-
 
     public Date getModifiedAt() {
         return modifiedAt;

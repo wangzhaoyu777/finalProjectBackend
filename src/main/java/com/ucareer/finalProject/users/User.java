@@ -8,9 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static javax.persistence.TemporalType.TIMESTAMP;
 
@@ -39,8 +37,8 @@ public class User {
     private String address;
     private String status;
 
-    @OneToMany
-    private List<Landing> landings = new ArrayList<>();
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Landing landing;
 
     @Temporal(TIMESTAMP)
     @Column(name = "create_at", updatable = false)
@@ -54,12 +52,12 @@ public class User {
     //@LastModifiedDate
     private Date modifiedAt;
 
-    public List<Landing> getLandings() {
-        return landings;
+    public Landing getLanding() {
+        return landing;
     }
 
-    public void setLandings(List<Landing> landings) {
-        this.landings = landings;
+    public void setLanding(Landing landings) {
+        this.landing = landings;
     }
 
     public Long getId() {

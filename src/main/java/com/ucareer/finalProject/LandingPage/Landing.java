@@ -1,11 +1,9 @@
 package com.ucareer.finalProject.LandingPage;
 
-import com.ucareer.finalProject.galleries.Gallery;
-import com.ucareer.finalProject.galleryItems.GalleryItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ucareer.finalProject.heads.Head;
 import com.ucareer.finalProject.menusItems.MenusItem;
 import com.ucareer.finalProject.users.User;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -23,25 +21,19 @@ public class Landing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Head headId;
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    private Head head;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Gallery galleryId;
+    @OneToOne(mappedBy = "landing")
+    @JsonIgnore
+    private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User userId;
-
-    @ManyToMany
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "landing")
     private List<MenusItem> menusItems = new ArrayList<>();
 
-    @ManyToMany
-    private List<GalleryItem> galleryItems = new ArrayList<>();
-
     private String slug;
-
+    private String name;
     @Temporal(TIMESTAMP)
     @Column(name = "create_at", updatable = false)
     @CreationTimestamp
@@ -52,20 +44,12 @@ public class Landing {
     @UpdateTimestamp
     private Date modifiedAt;
 
-    public List<GalleryItem> getGalleryItems() {
-        return galleryItems;
+    public User getUser() {
+        return user;
     }
 
-    public void setGalleryItems(List<GalleryItem> galleryItems) {
-        this.galleryItems = galleryItems;
-    }
-
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public List<MenusItem> getMenusItems() {
@@ -92,20 +76,12 @@ public class Landing {
         this.name = name;
     }
 
-    public Head getHeadId() {
-        return headId;
+    public Head getHead() {
+        return head;
     }
 
-    public void setHeadId(Head headId) {
-        this.headId = headId;
-    }
-
-    public Gallery getGalleryId() {
-        return galleryId;
-    }
-
-    public void setGalleryId(Gallery galleryId) {
-        this.galleryId = galleryId;
+    public void setHead(Head head) {
+        this.head = head;
     }
 
     public String getSlug() {

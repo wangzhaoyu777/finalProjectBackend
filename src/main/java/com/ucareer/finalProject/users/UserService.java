@@ -1,6 +1,9 @@
 package com.ucareer.finalProject.users;
 
+import com.ucareer.finalProject.LandingPage.Landing;
+import com.ucareer.finalProject.LandingPage.LandingRepository;
 import com.ucareer.finalProject.core.JWT;
+import com.ucareer.finalProject.heads.Head;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +17,7 @@ public class UserService {
     private PasswordEncoder encoder;
 
     private final UserRepository userRepository;
+    private LandingRepository landingRepository;
 
     @Autowired
     private JWT jwt;
@@ -37,16 +41,29 @@ public class UserService {
             // username already exist
             return null;
         } else {
-            userBody.setPassword(encoder.encode(userBody.getPassword()));
-            userBody.setStatus("Active");
-//            User savingUser = new User();
-//            savingUser.setFirstName(userBody.getFirstName());
-//            savingUser.setLastName(userBody.getLastName());
-//            savingUser.setUsername(userBody.getUsername());
-//            savingUser.setPhone(userBody.getPhone());
-//            savingUser.setAddress(userBody.getAddress());
-//            savingUser.setPassword(encoder.encode(userBody.getPassword()));
-            User savedUser = userRepository.save(userBody);
+
+            //huifu
+            User savingUser = new User();
+            savingUser.setFirstName(userBody.getFirstName());
+            savingUser.setLastName(userBody.getLastName());
+            savingUser.setUsername(userBody.getUsername());
+            savingUser.setPhone(userBody.getPhone());
+            savingUser.setAddress(userBody.getAddress());
+            savingUser.setPassword(encoder.encode(userBody.getPassword()));
+
+            //在用户注册完成之后，会自动生成一个default的landing page
+            Landing defaultLanding = new Landing();
+            defaultLanding.setName("Welcome");
+            savingUser.setLanding(defaultLanding);
+            //自动生成head
+            Head defaultHead = new Head();
+            defaultHead.setTitle("title");
+            defaultHead.setDescription("Description");
+            defaultHead.setImg_url("Img_url");
+            defaultLanding.setHead(defaultHead);
+
+            User savedUser = userRepository.save(savingUser);
+
             return savedUser;
         }
     }
